@@ -4,6 +4,13 @@
 ###
 'use strict'
 parseRange = require 'range-parser'
+Busboy = require 'busboy'
+RawBody= require 'raw-body'
+Zlib = require 'zlib'
+Iconv= require 'iconv-lite'
+NativeFs = require 'fs'
+fs		= require 'mz/fs'
+Path	= require 'path'
 
 #=include _settings.coffee
 #=include _upload.coffee
@@ -58,19 +65,27 @@ class Uploader
 	 * Reload parser
 	###
 	reload: (settings)->
+		# Load settings
+		_initSettings @app, settings
 		# enable
 		@enable()
 		return
 	###*
 	 * destroy
 	###
-	destroy: ->
-		return
+	destroy: -> @disable
 	###*
 	 * Disable, enable
 	###
-	disable: -> @destroy
+	disable: ->
+		@app.removeProperties
+			Request: REQUEST_PROTO
+			Context: CONTEXT_PROTO
+		return
 	enable: ->
+		@app.addProperties
+			Request: REQUEST_PROTO
+			Context: CONTEXT_PROTO
 		return
 
 module.exports = Uploader

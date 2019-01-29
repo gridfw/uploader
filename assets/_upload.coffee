@@ -21,7 +21,7 @@ _uploadPostData= (options)->
 			limits = options.limits = @s[<%= settings.limits %>]
 		# body size limit
 		bodySize = req.headers['content-length']
-		throw new Error "Content length #{bodySize} exceeds #{limits.size}Bytes" if bodySize and bodySize > limits.size
+		return Promise.reject "Content length #{bodySize} exceeds #{limits.size}Bytes" if bodySize and bodySize > limits.size
 		# upload progress
 		if 'progress' of options
 			onProgress = options.progress
