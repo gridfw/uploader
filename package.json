@@ -31,5 +31,11 @@
   "bugs": {
     "url": "https://github.com/gridfw/uploader/issues"
   },
-  "homepage": "https://github.com/gridfw/uploader#readme"
+  "homepage": "https://github.com/gridfw/uploader#readme",
+  "dependencies": {
+    "busboy": "^0.3.0",
+    "mz": "^2.7.0",
+    "range-parser": "^1.2.0",
+    "raw-body": "^2.3.3"
+  }
 }

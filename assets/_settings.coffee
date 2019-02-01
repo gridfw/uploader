@@ -6,7 +6,7 @@ _initSettings = <%= initSettings %>
 			throw "Expected >0 or Infinity" unless (tmout is Infinity) or Number.isSafeInteger(tmout) and tmout > 0
 	tmpDir:
 		default: require('os').tmpdir()
-		(dir)-> throw "Expected string" unless typeof dir is 'string'
+		check: (dir)-> throw "Expected string" unless typeof dir is 'string'
 	limits:
 		default:
 			size: 20 * (2**20) # Max body size (20M)
