@@ -50,3 +50,7 @@ Optional could be added to config file or to "ctx.upload" method
     headerPairs: 2000 // the max number of header 
 }
 ```
+
+
+# Supporters
+[![coredigix](https://www.coredigix.com/img/logo.png)](https://coredigix.com)

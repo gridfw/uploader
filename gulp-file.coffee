@@ -6,11 +6,12 @@ uglify			= require('gulp-uglify-es').default
 rename			= require "gulp-rename"
 coffeescript	= require 'gulp-coffeescript'
 
-GfwCompiler		= require '../compiler'
+GfwCompiler		= require 'gridfw-compiler'
 
 
 
-settings = 
+settings =
+	mode: gutil.env.mode || 'dev'
 	isProd: gutil.env.mode is 'prod'
 
 # compile final values (consts to be remplaced at compile time)
