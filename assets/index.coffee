@@ -78,12 +78,12 @@ class Uploader
 	 * Disable, enable
 	###
 	disable: ->
-		@app.removeProperties
+		@app.removeProperties 'Uploader',
 			Request: REQUEST_PROTO
 			Context: CONTEXT_PROTO
 		return
 	enable: ->
-		@app.addProperties
+		@app.addProperties 'Uploader',
 			Request: REQUEST_PROTO
 			Context: CONTEXT_PROTO
 		return
