@@ -2,15 +2,15 @@
 
 ## Installation
 This package will be installed automatically with Gridfw framework.
-(or use: npm i -S gridfw-downloader)
+(or use: npm i -S gridfw-uploader)
 
 ## Configuration
 Inside your config file, add the following:
 ```javascript
 {
     plugins: {
-        downloader:{
-            require: 'gridfw-downloader',
+        uploader:{
+            require: 'gridfw-uploader',
             // add options here
             // all are optionals
         }
@@ -38,7 +38,7 @@ app.post('/path', function(ctx){
 Optional could be added to config file or to "ctx.upload" method
 ```javascript
 {
-    size: 20 * (2**10), // Max body size (20M)
+    size: 20 * (2**20), // Max body size (20M)
     // multipart/form-data and application/x-www-form-urlencoded options
     fieldNameSize: 1000, // Max field name size (in bytes)
     fieldSize: 2**20, // Max field value size (default 1M)
