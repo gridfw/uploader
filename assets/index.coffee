@@ -12,6 +12,9 @@ NativeFs = require 'fs'
 fs		= require 'mz/fs'
 Path	= require 'path'
 
+# utils
+_create= Object.create
+
 #=include _settings.coffee
 #=include _upload.coffee
 
