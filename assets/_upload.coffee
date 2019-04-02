@@ -44,6 +44,13 @@ _uploadPostData= (options)->
 ###*
  * Upload form URL encoded and multipart data
 ###
+_addField= (result, fieldname, value)->
+	if vl= result[fieldname]
+		vl= result[fieldname]= [vl] unless Array.isArray vl
+		vl.push value
+	else
+		result[fieldname]= value
+	return
 _uploadPostDataForm = (ctx, options)->
 	new Promise (resolve, reject)=>
 		# options
@@ -86,7 +93,7 @@ _uploadPostDataForm = (ctx, options)->
 					else
 						throw err
 				# add value
-				result[fieldname] = val
+				_addField result, fieldname, val
 			catch err
 				errorHandle err
 		# when receive files
@@ -109,7 +116,7 @@ _uploadPostDataForm = (ctx, options)->
 					# pipe stream
 					file.pipe NativeFs.createWriteStream fPath
 				# create file descriptor
-				result[fieldname] = 
+				_addField result, fieldname,
 					path:  fPath
 					name:  filename
 					encoding:  encoding
