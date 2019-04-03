@@ -18,7 +18,7 @@ _uploadPostData= (options)->
 		if typeof limits is 'object' and limits
 			Object.setPrototypeOf limits, @s[<%= settings.limits %>]
 		else
-			limits = options.limits = @s[<%= settings.limits %>]
+			limits = options.limits = _create @s[<%= settings.limits %>]
 		# body size limit
 		bodySize = req.headers['content-length']
 		return Promise.reject "Content length #{bodySize} exceeds #{limits.size}Bytes" if bodySize and bodySize > limits.size
@@ -99,6 +99,8 @@ _uploadPostDataForm = (ctx, options)->
 		# when receive files
 		onFile = options.onFile
 		filePath= options.filePath
+		fileExtensions= options.files?.extensions
+		keepExtension= options.files?.keepExtension or false
 		busboy.on 'file', (fieldname, file, filename, encoding, mimetype) ->
 			try
 				# save file stream
@@ -110,9 +112,13 @@ _uploadPostDataForm = (ctx, options)->
 				else
 					# file path
 					if filePath
-						fPath = filePath filename
+						fPath = filePath filename, fieldname, mimetype
 					else
-						fPath = await _getTmpFileName uploadDir
+						# check extension
+						ext= Path.extname(filename).toLowerCase()
+						if fileExtensions
+							throw new Error "Rejected extension: [#{ext}], accepted are: #{fileExtensions.join ','}" if ext not in fileExtensions
+						fPath = await _getTmpFileName uploadDir, if keepExtension then ext else '.tmp'
 					# pipe stream
 					file.pipe NativeFs.createWriteStream fPath
 				# create file descriptor
@@ -189,7 +195,7 @@ _uploadPostDataRaw = (ctx, options)->
 				if filePath
 					fPath = filePath filename
 				else
-					fPath = await _getTmpFileName uploadDir
+					fPath = await _getTmpFileName uploadDir, '.tmp'
 				# pipe stream
 				stream.pipe NativeFs.createWriteStream fPath
 			# create file descriptor
@@ -257,11 +263,11 @@ getBody = (req, maxSize, cb) ->
 TMP_FILE_MAX_LOOP = 1000
 TMP_FILE_CREATE_FLAGS= 'wx+'
 TMP_FILE_MODE = 0o600
-_getTmpFileName = (dir)->
+_getTmpFileName = (dir, ext)->
 	i = 0
 	loop
 		try
-			fPath = Path.join dir, _rand() + 'tmp'
+			fPath = Path.join dir, _rand() + ext
 			fd= await fs.open fPath, TMP_FILE_CREATE_FLAGS, TMP_FILE_MODE
 			await fs.close fd
 			return fPath
