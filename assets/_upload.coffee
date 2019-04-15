@@ -1,7 +1,9 @@
 ###*
  * Upload and parse post data
- * @param {Object} options.limits - @see busboy limits
- * @param {function} options.onError(error, ctx) - do what ever when got error, reject error to cancel process
+ * @optional @param {Object} options.limits - @see busboy limits
+ * @optional @param {[type]} options.type - fix the type of uploaded data @default: undefined: all types are accepted
+ * @optional @param {String} options.files.fields - list of all file names 
+ * @optional @param {function} options.onError(error, ctx) - do what ever when got error, reject error to cancel process
 ###
 
 _uploadPostData= (options)->
@@ -30,14 +32,18 @@ _uploadPostData= (options)->
 				len = data.length
 				progressReceived += len
 				onProgress len, progressReceived, bodySize
-		# switch content type
-		switch contentType
-			when 'multipart/form-data', 'application/x-www-form-urlencoded'
-				resultPromise = _uploadPostDataForm this, options
-			when 'application/json'
-				resultPromise = _uploadPostDataJSON this, options
-			else # raw: application/octet-stream
-				resultPromise = _uploadPostDataRaw this, options
+		# check options type
+		if options.type and options.type isnt contentType
+			resultPromise= Promise.reject new Error "received type: #{contentType}, expected: #{options.type}"
+		else
+			# switch content type
+			switch contentType
+				when 'multipart/form-data', 'application/x-www-form-urlencoded'
+					resultPromise = _uploadPostDataForm this, options
+				when 'application/json'
+					resultPromise = _uploadPostDataJSON this, options
+				else # raw: application/octet-stream
+					resultPromise = _uploadPostDataRaw this, options
 		# return promise
 		@_uploadP = resultPromise
 		return resultPromise
@@ -51,13 +57,22 @@ _addField= (result, fieldname, value)->
 	else
 		result[fieldname]= value
 	return
+# basic multipart result prototype
+multipartResutProto=
+	# remove all uploaded tmp files
+	removeTmpFiles: ->
+		tmpFiles= @_tmpFiles
+		if tmpFiles
+			for path in tmpFiles
+				await fs.unlink path
+		return
 _uploadPostDataForm = (ctx, options)->
 	new Promise (resolve, reject)=>
 		# options
 		limits = options.limits
 		uploadDir= options.dir || ctx.s[<%= settings.tmpDir %>]
 		# result
-		result = _create null
+		result = _create multipartResutProto
 		errorHandle = options.onError
 		files = []
 		# busboy instance
@@ -99,10 +114,16 @@ _uploadPostDataForm = (ctx, options)->
 		# when receive files
 		onFile = options.onFile
 		filePath= options.filePath
-		fileExtensions= options.files?.extensions
-		keepExtension= options.files?.keepExtension or false
+		# file options
+		if fileOptions= options.files
+			fileExtensions= fileOptions.extensions
+			keepExtension= fileOptions.keepExtension or false
+			fileFields= fileOptions.fields
 		busboy.on 'file', (fieldname, file, filename, encoding, mimetype) ->
 			try
+				# check fieldname
+				if fileFields and fieldname not in fileFields
+					throw new Error "Rejected file field #{fieldname}"
 				# save file stream
 				files.push file
 				# process
@@ -119,6 +140,8 @@ _uploadPostDataForm = (ctx, options)->
 						if fileExtensions
 							throw new Error "Rejected extension: [#{ext}], accepted are: #{fileExtensions.join ','}" if ext not in fileExtensions
 						fPath = await _getTmpFileName uploadDir, if keepExtension then ext else '.tmp'
+						# add to tmp files array
+						(result._tmpFiles ?= []).push fPath
 					# pipe stream
 					file.pipe NativeFs.createWriteStream fPath
 				# create file descriptor
