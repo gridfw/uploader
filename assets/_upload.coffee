@@ -33,7 +33,7 @@ _uploadPostData= (options)->
 				progressReceived += len
 				onProgress len, progressReceived, bodySize
 		# check options type
-		if options.type and options.type isnt contentType
+		if (type= options.type) and (if Array.isArray(type) then contentType not in type else contentType isnt type)
 			resultPromise= Promise.reject new Error "received type: #{contentType}, expected: #{options.type}"
 		else
 			# switch content type
