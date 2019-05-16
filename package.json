@@ -1,6 +1,6 @@
 {
   "name": "gridfw-uploader",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "data uploader for gridfw",
   "main": "build/index.js",
   "scripts": {
@@ -20,11 +20,11 @@
   "license": "MIT",
   "devDependencies": {
     "cli-table": "^0.3.1",
-    "gridfw-compiler": "^1.0.0",
-    "gulp": "^4.0.0",
+    "gridfw-compiler": "^1.2.0",
+    "gulp": "^4.0.2",
     "gulp-chug": "^0.5.1",
     "gulp-coffeescript": "0.0.15",
-    "gulp-include": "^2.3.1",
+    "gulp-include": "^2.4.1",
     "gulp-rename": "^1.4.0",
     "gulp-uglify-es": "^1.0.4",
     "gulp-util": "^3.0.8"
@@ -34,9 +34,9 @@
   },
   "homepage": "https://github.com/gridfw/uploader#readme",
   "dependencies": {
-    "busboy": "^0.3.0",
+    "busboy": "^0.3.1",
     "mz": "^2.7.0",
-    "range-parser": "^1.2.0",
-    "raw-body": "^2.3.3"
+    "range-parser": "^1.2.1",
+    "raw-body": "^2.4.0"
   }
 }
